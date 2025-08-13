@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Notation Research Experiment</title>
+  <meta name="description" content="Web app for Student Notation (SN) research experiment." />
+  <!-- Vite serves /public at the web root -->
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Student Notation — Experiment</h1>
+    <nav>
+      <span class="chip">Pilot build</span>
+      <span class="chip">Static (GitHub Pages)</span>
+      <button id="exportBtn" class="btn">Export CSV</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Welcome -->
+    <section id="welcome" class="card active" aria-labelledby="welcome-h">
+      <h2 id="welcome-h">Welcome</h2>
+      <div class="row">
+        <div class="col">
+          <p>
+            Compare Student Notation (SN) with Western Standard Music Notation (WSMN)
+            on Interval and Scale‑Degree identification. We record accuracy and response time.
+          </p>
+          <ul>
+            <li>SN tutorial (quick checks)</li>
+            <li>Interval ID + Scale‑Degree ID tasks</li>
+            <li>SN + WSMN variants</li>
+            <li>CSV export (no server needed)</li>
+          </ul>
+          <div class="inline-grid">
+            <button class="btn primary" data-nav="tutorial">Start tutorial</button>
+            <button class="btn" data-nav="menu">Skip to tasks</button>
+          </div>
+        </div>
+        <div class="col">
+          <div class="stack">
+            <label class="stack-sm" for="pid">
+              <span class="muted">Participant ID (optional)</span>
+              <input id="pid" class="btn ghost" placeholder="e.g., 012345" />
+            </label>
+            <div class="stack-sm">
+              <span class="muted">Mode</span>
+              <div class="inline-grid">
+                <button class="btn" data-mode="guided">Guided</button>
+                <button class="btn" data-mode="free">Free-run</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tutorial -->
+    <section id="tutorial" class="card" aria-labelledby="tut-h">
+      <h2 id="tut-h">Student Notation tutorial</h2>
+      <div class="stack">
+        <p>
+          SN uses 12 chromatic rows. Thick lines mark <b>C</b>, dashed lines mark <b>E</b>,
+          and shaded rows mark <b>G</b>. A circled <span class="mono">1</span> shows the key.
+        </p>
+        <div class="board">
+          <div class="title">
+            <span class="muted">SN demo</span>
+            <span class="legend"><span>Thick=C</span><span>Dashed=E</span><span>Grey=G</span></span>
+          </div>
+          <div class="canvas" id="tutCanvas" aria-label="Student Notation demo"></div>
+        </div>
+        <div class="bar">
+          <div class="muted">Check #1: Which pitch is shown?</div>
+          <div class="right"><button class="btn" data-check="pitch">Reveal answer</button></div>
+        </div>
+        <div class="bar">
+          <div class="muted">Check #2: Which interval is shown?</div>
+          <div class="right"><button class="btn" data-check="interval">Reveal answer</button></div>
+        </div>
+        <div class="inline-grid">
+          <button class="btn" data-nav="welcome">Back</button>
+          <button class="btn primary" data-nav="menu">Continue to tasks</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Task menu -->
+    <section id="menu" class="card" aria-labelledby="menu-h">
+      <h2 id="menu-h">Choose a task</h2>
+      <div class="stack">
+        <div class="row">
+          <div class="col">
+            <div class="board">
+              <div class="title"><b>Interval Identification</b> <span class="muted">(15 trials)</span></div>
+              <div class="stack-sm">
+                <button class="btn primary" data-start="AS">Start — SN</button>
+                <button class="btn" data-start="AW">Start — WSMN</button>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="board">
+              <div class="title"><b>Scale Degree Identification</b> <span class="muted">(15 trials)</span></div>
+              <div class="stack-sm">
+                <button class="btn primary" data-start="BS">Start — SN</button>
+                <button class="btn" data-start="BW">Start — WSMN</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="inline-grid">
+          <button class="btn" data-nav="welcome">Back</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Runner -->
+    <section id="runner" class="card" aria-live="polite">
+      <div class="bar">
+        <div class="inline-grid">
+          <button class="btn" data-nav="menu">← Exit</button>
+          <span class="chip" id="modeChip">Guided</span>
+        </div>
+        <div class="inline-grid right">
+          <span class="chip" id="taskLabel">Task</span>
+          <span class="chip" id="progress">0/15</span>
+          <span class="chip" id="timer">0.00s</span>
+        </div>
+      </div>
+      <div class="task-wrap">
+        <div class="board">
+          <div class="title">
+            <span id="displayKind">Student Notation</span>
+            <span class="legend"><span>Thick=C</span><span>Dashed=E</span><span>Grey=G</span></span>
+          </div>
+          <div class="canvas" id="taskCanvas" aria-label="Question display"></div>
+        </div>
+        <div class="stack">
+          <div class="feedback" id="feedback" aria-live="assertive"></div>
+          <div class="pad" id="answerPad" role="group" aria-label="Answer options"></div>
+          <div class="bar">
+            <button class="btn" id="skipBtn" title="Skip this trial (counts as incorrect)">Skip</button>
+            <button class="btn right" id="nextBtn" disabled>Next</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>v0.2 — Modular ES‑modules. Plug in real banks and WSMN renderer/image set when ready.</div>
+  </footer>
+
+  <!-- Vite dev/preview serves modules from / -->
+  <script type="module" src="/src/app.js"></script>
+</body>
+</html>
