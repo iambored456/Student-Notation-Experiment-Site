@@ -1,11 +1,27 @@
-import { renderSN, renderWSPlaceholder } from '../sn/renderer.js';
+import { renderSN, renderFullSN } from '../sn/canvasRenderer.js';
+import { renderWSPlaceholder } from '../sn/renderer.js';
 import { INTERVAL_UI, DEGREE_LABELS, normalizeDegree } from '../sn/constants.js';
 import { BANK, shuffle } from './bank.js';
 import { state } from './state.js';
+import { getPitchRowIndex } from '../utils/pitchMapping.js';
 
 const $ = (q, el = document) => el.querySelector(q);
 
 const answerPad = $('#answerPad');
+
+// Helper function to convert simple note data to canvas format
+function convertNotesToCanvasFormat(notes, keyRoot = null) {
+  if (!notes || notes.length === 0) return [];
+  
+  return notes.map((pitch, index) => ({
+    row: getPitchRowIndex(pitch),
+    startColumnIndex: 2 + index, // Start after legend columns
+    endColumnIndex: 2 + index,
+    shape: 'oval',
+    color: '#4a90e2',
+    isDrum: false
+  })).filter(note => note.row !== -1);
+}
 const feedbackEl = $('#feedback');
 const progressEl = $('#progress');
 const timerEl = $('#timer');
@@ -61,9 +77,21 @@ function renderCurrent() {
   nextBtn.disabled = true; feedbackEl.className = 'feedback'; feedbackEl.textContent = '';
 
   if (state.run.task === 'AS') {
-    renderSN(canvas, { keyRoot: null, notes: item.pitches });
+    // Use new canvas renderer for Student Notation with intervals
+    const canvasNotes = convertNotesToCanvasFormat(item.pitches);
+    renderFullSN(canvas, {
+      scrollOffset: 1650, // Center on middle octaves
+      zoomLevel: 1.5,
+      notes: canvasNotes
+    });
   } else if (state.run.task === 'BS') {
-    renderSN(canvas, { keyRoot: item.key, notes: [item.pitch] });
+    // Use new canvas renderer for Student Notation with scale degrees
+    const canvasNotes = convertNotesToCanvasFormat([item.pitch], item.key);
+    renderFullSN(canvas, {
+      scrollOffset: 1650, // Center on middle octaves  
+      zoomLevel: 1.5,
+      notes: canvasNotes
+    });
   } else {
     renderWSPlaceholder(canvas); // swap with real images or renderer
   }

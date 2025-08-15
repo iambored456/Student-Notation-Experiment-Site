@@ -1,2 +1,6 @@
 node_modules/
 docs/
+Student-Notation-resource/
+.claude/
+.git/
+package-lock.json
